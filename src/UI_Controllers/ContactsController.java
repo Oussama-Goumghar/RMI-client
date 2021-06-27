@@ -1,14 +1,15 @@
 package UI_Controllers;
 
-import ExtraWork.CreateMessages;
-import Data.Data;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 
+import javafx.scene.control.*;
 import javafx.util.Duration;
 import java.net.URL;
+import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ResourceBundle;
@@ -22,12 +23,6 @@ import javafx.collections.ListChangeListener;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -44,9 +39,19 @@ import javax.imageio.ImageIO;
 
 
 public class ContactsController implements Initializable{
-    
+    private String name;
+    private ChatClient3 chatClient;
     @FXML private VBox MAIN_CONTACTS, MSGS_CONTAINER;
     @FXML private AnchorPane MAIN_FRM;
+
+    public VBox getMSGS_CONTAINER() {
+        return MSGS_CONTAINER;
+    }
+
+    public void setMSGS_CONTAINER(VBox MSGS_CONTAINER) {
+        this.MSGS_CONTAINER = MSGS_CONTAINER;
+    }
+
     @FXML private ScrollPane SCROLL_BAR_CONTACTS, SCROLL_BAR;
     @FXML private AnchorPane ADDUSER_PANE;
     @FXML private TextField USERNAME_TXT, PHONENUMBER_TXT;
@@ -152,7 +157,7 @@ public class ContactsController implements Initializable{
             //*****************[UserImage and Final Combination]***************************
 
             Circle USER_IMAGE = new Circle(25, 25, 25);
-            USER_IMAGE.setFill(new ImagePattern(UserImage));
+            USER_IMAGE.setFill(new ImagePattern( new Image(getClass().getResourceAsStream("/Images/plus.png"))));
             USER_IMAGE.setSmooth(true);
 
             HBox CONTACT = new HBox(USER_IMAGE, CONTACT_ITEM);
@@ -225,18 +230,19 @@ public class ContactsController implements Initializable{
     }
     
     @FXML
-    public void sendMessage(ActionEvent e){
-        if(!MSG_TXT.getText().equals("")){
-            SR.sendMessage(MSG_TXT.getText(), new SimpleDateFormat("hh:mm a").format(new Date()), MSGS_CONTAINER, (event) -> {
-                System.out.println("1. Clecked :D");
-            });
-        }
+    public void sendMessage(ActionEvent e) throws RemoteException {
+        chatClient.serverIF.updateChat(name, MSG_TXT.getText());
+        SR.sendMessage(MSG_TXT.getText(), new SimpleDateFormat("hh:mm a").format(new Date()), MSGS_CONTAINER, (event) -> {
+            System.out.println("1. Clecked :D");
+        });
         MSG_TXT.clear();
     }
     
     @FXML
     public void receiveMessage(ActionEvent e){
         if(!MSG_TXT.getText().equals("")){
+
+            System.out.println(MSG_TXT.getText());
             SR.receiveMessage(MSG_TXT.getText(), new SimpleDateFormat("hh:mm a").format(new Date()), MSGS_CONTAINER, (event) -> {
                 System.out.println("1. Clecked :D");
             });
@@ -254,7 +260,7 @@ public class ContactsController implements Initializable{
                 AnchorPane.setLeftAnchor(MORE_BTNS, 70.0);
                 SCROLL_BAR_CONTACTS.setVisible(false);
             }
-            else{
+            else {
                 AnchorPane.setLeftAnchor(MORE_BTNS, 360.0);
                 AnchorPane.setLeftAnchor(MSG_TXT, 291.0);
                 AnchorPane.setLeftAnchor(SCROLL_BAR, 291.0);
@@ -280,8 +286,40 @@ public class ContactsController implements Initializable{
         IMAGE_CONTAINER.setOnMouseClicked((value) -> {
             chooseImage(value);
         });
-    } 
-    
+    }
+    public void showAlert(String msg){
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, msg, ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
+        alert.showAndWait();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) throws RemoteException {
+        this.name = name;
+        System.out.println("username : " + name + " connecting to chat...\n");
+        this.getConnected(name);
+        if(!chatClient.connectionProblem){
+            System.out.println("Connected No Problem");
+        }
+    }
+
+    private void sendMessage(String chatMessage) throws RemoteException {
+        chatClient.serverIF.updateChat(name, chatMessage);
+
+    }
+    private void getConnected(String userName) throws RemoteException{
+        //remove whitespace and non word characters to avoid malformed url
+        String cleanedUserName = userName.replaceAll("\\s+","_");
+        cleanedUserName = userName.replaceAll("\\W+","_");
+        try {
+            chatClient = new ChatClient3(this, cleanedUserName);
+            chatClient.startClient();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
     
     
     void setTempInfo(){

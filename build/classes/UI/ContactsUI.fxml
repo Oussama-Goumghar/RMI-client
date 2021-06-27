@@ -86,7 +86,7 @@
          </effect>
       </AnchorPane>
       <TextArea fx:id="MSG_TXT" layoutX="292.0" layoutY="505.0" prefHeight="57.0" prefWidth="446.0" promptText="Type a message..." AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="291.0" AnchorPane.rightAnchor="113.0" />
-      <Button fx:id="SEND_BTN" layoutX="738.0" layoutY="506.0" mnemonicParsing="false" onAction="#sendMessage" prefHeight="55.0" prefWidth="65.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="48.0">
+      <Button fx:id="SEND_BTN" layoutX="738.0" layoutY="506.0" mnemonicParsing="false" onAction="#receiveMessage" prefHeight="55.0" prefWidth="65.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="48.0">
          <graphic>
             <ImageView pickOnBounds="true" preserveRatio="true">
                <image>

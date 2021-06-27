@@ -1,5 +1,6 @@
-package ExtraWork;
+package UI_Controllers;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -80,7 +81,7 @@ public class CreateMessages {
     MAIN_MSG.setAlignment(Pos.CENTER_RIGHT);
     MAIN_MSG.setSpacing(5);
     MAIN_MSG.setId("MAIN_MSG");
-    MSGS_CONTAINER.getChildren().add(MAIN_MSG);
+        Platform.runLater(()-> MSGS_CONTAINER.getChildren().add(MAIN_MSG));
 
 }
     /**
@@ -140,6 +141,7 @@ public class CreateMessages {
         MAIN_MSG2.setAlignment(Pos.CENTER_LEFT);
         MAIN_MSG2.setSpacing(5);
         MAIN_MSG2.setId("MAIN_MSG2");
-        MSGS_CONTAINER.getChildren().add(MAIN_MSG2);
+        Platform.runLater(()-> MSGS_CONTAINER.getChildren().add(MAIN_MSG2));
+
     }
 }
